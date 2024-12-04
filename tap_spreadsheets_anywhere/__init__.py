@@ -4,7 +4,7 @@ import logging
 
 import dateutil
 import singer
-from singer import utils
+from singer import utils, get_bookmark
 from singer.catalog import Catalog, CatalogEntry
 from singer.schema import Schema
 
@@ -110,7 +110,7 @@ def sync(config, state, catalog):
                 key_properties=stream.key_properties,
             )
             modified_since = dateutil.parser.parse(
-                state.get(stream.tap_stream_id, {}).get('modified_since') or table_spec['start_date'])
+                get_bookmark(state, stream.tap_stream_id, 'modified_since') or table_spec['start_date'])
             target_files = file_utils.get_matching_objects(table_spec, modified_since)
             max_records_per_run = table_spec.get('max_records_per_run', -1)
             records_streamed = 0
